@@ -23,10 +23,19 @@ final class UserController extends AbstractController
         $this->passwordEncoder = $passwordEncoder;
     }
     #[Route('/user', name: 'app_user')]
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return $this->json([
-            'message' => 'Logado!',
+        $session = $request->getSession();
+
+        $userName = $session->get('nome');
+        $userEmail = $session->get('email');
+        $userId = $session->get('usuario_id');
+
+        return new JsonResponse([
+            'message' => 'Seja bem vindo, ' . $userName . '!',
+            'nome' => $userName,
+            'email' => $userEmail,
+            'usuario_id' => $userId,
         ]);
     }
 
@@ -50,17 +59,17 @@ final class UserController extends AbstractController
     #[Route('/login', methods: ['GET'])]
     public function login(Request $request): JsonResponse
     {
-        $email = $request->query->get('email');
-        $senha = $request->query->get('senha');
+        $userEmail = $request->query->get('email');
+        $userPassword = $request->query->get('senha');
 
-        $user = $this->userRepository->findByEmail($email);
+        $user = $this->userRepository->findByEmail($userEmail);
 
-        if (!$user || !$this->passwordEncoder->isPasswordValid($user, $senha)) {
+        if (!$user || !$this->passwordEncoder->isPasswordValid($user, $userPassword)) {
             return new JsonResponse(['mensagem' => 'Senha ou email incorreto'], 401);
         }
 
         $session = $request->getSession();
-        $session->set('usuario', $user->getId());
+        $session->set('usuario_id', $user->getId());
         $session->set('nome', $user->getName());
         $session->set('email', $user->getEmail());
 
