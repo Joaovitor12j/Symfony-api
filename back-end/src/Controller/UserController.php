@@ -22,18 +22,17 @@ final class UserController extends AbstractController
         $this->userRepository = $userRepository;
         $this->passwordEncoder = $passwordEncoder;
     }
-    #[Route('/user', name: 'app_user')]
+    #[Route('/user', methods: ['GET'])]
     public function index(Request $request): JsonResponse
     {
         $session = $request->getSession();
 
-        $userName = $session->get('nome');
+        $userName = $session->get('name');
         $userEmail = $session->get('email');
         $userId = $session->get('usuario_id');
 
         return new JsonResponse([
-            'message' => 'Seja bem vindo, ' . $userName . '!',
-            'nome' => $userName,
+            'name' => $userName,
             'email' => $userEmail,
             'usuario_id' => $userId,
         ]);
@@ -45,22 +44,27 @@ final class UserController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $user = new User();
-        $user->setName($data['nome']);
+        $user->setName($data['name']);
         $user->setEmail($data['email']);
-        $user->setPassword($this->passwordEncoder->hashPassword($user, $data['senha']));
+        $user->setPassword($this->passwordEncoder->hashPassword($user, $data['password']));
         $user->setCreateAt(new DateTime());
 
         $em->persist($user);
         $em->flush();
 
-        return new JsonResponse(['message' => 'Usuário criado com sucesso!'], 201);
+        return new JsonResponse([
+            'name' => $data['name'],
+            'email' => $data['email']
+        ], 201);
     }
 
-    #[Route('/login', methods: ['GET'])]
+    #[Route('/login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
     {
-        $userEmail = $request->query->get('email');
-        $userPassword = $request->query->get('senha');
+        $data = json_decode($request->getContent(), true);
+
+        $userEmail = $data['email'] ?? null;
+        $userPassword = $data['password'] ?? null;
 
         $user = $this->userRepository->findByEmail($userEmail);
 
@@ -70,10 +74,14 @@ final class UserController extends AbstractController
 
         $session = $request->getSession();
         $session->set('usuario_id', $user->getId());
-        $session->set('nome', $user->getName());
+        $session->set('name', $user->getName());
         $session->set('email', $user->getEmail());
 
-        return new JsonResponse(['mensagem' => 'Logado com sucesso!']);
+        return new JsonResponse([
+            'name' => $user->getName(),
+            'email' => $data['email']
+        ], 200);
+
     }
 
     #[Route('/logout', methods: ['GET'])]
@@ -82,7 +90,7 @@ final class UserController extends AbstractController
         $session = $request->getSession();
         $session->invalidate();
 
-        return new JsonResponse(['message' => 'Deslogado com sucesso!']);
+        return new JsonResponse('', 200);
     }
 
 }
