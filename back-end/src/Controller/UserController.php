@@ -76,4 +76,13 @@ final class UserController extends AbstractController
         return new JsonResponse(['mensagem' => 'Logado com sucesso!']);
     }
 
+    #[Route('/logout', methods: ['GET'])]
+    public function logout(Request $request): JsonResponse
+    {
+        $session = $request->getSession();
+        $session->invalidate();
+
+        return new JsonResponse(['message' => 'Deslogado com sucesso!']);
+    }
+
 }
