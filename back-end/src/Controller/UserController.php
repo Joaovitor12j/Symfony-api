@@ -26,8 +26,7 @@ final class UserController extends AbstractController
     public function index(): JsonResponse
     {
         return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/UserController.php',
+            'message' => 'Logado!',
         ]);
     }
 
@@ -62,6 +61,8 @@ final class UserController extends AbstractController
 
         $session = $request->getSession();
         $session->set('usuario', $user->getId());
+        $session->set('nome', $user->getName());
+        $session->set('email', $user->getEmail());
 
         return new JsonResponse(['mensagem' => 'Logado com sucesso!']);
     }
