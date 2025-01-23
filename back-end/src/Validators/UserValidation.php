@@ -42,7 +42,8 @@ class UserValidation
      */
     public function validateEmailExists(): void
     {
-        $this->throwIf($this->userData->getEmail(), 'Esse email já está cadastrado, faça login ou informe outro email',
+        $exists = $this->userData && ! empty($this->userData->getEmail());
+        $this->throwIf($exists, 'Esse email já está cadastrado, faça login ou informe outro email',
             Response::HTTP_UNPROCESSABLE_ENTITY
         );
     }
