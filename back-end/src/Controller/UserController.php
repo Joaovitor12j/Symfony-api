@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -73,7 +74,7 @@ final class UserController extends AbstractController
         return new JsonResponse([
             'name' => $user->getName(),
             'email' => $user->getEmail()
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -100,7 +101,7 @@ final class UserController extends AbstractController
         return new JsonResponse([
             'name' => $user->getName(),
             'email' => $user->getEmail()
-        ], 200);
+        ], Response::HTTP_OK);
 
     }
 
@@ -110,7 +111,7 @@ final class UserController extends AbstractController
         $session = $request->getSession();
         $session->invalidate();
 
-        return new JsonResponse('', 204);
+        return new JsonResponse('', Response::HTTP_NO_CONTENT);
     }
 
 }
