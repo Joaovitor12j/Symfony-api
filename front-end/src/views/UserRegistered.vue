@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Bem-vindo, {{ user.name }}!</h1>
+    <h1>Olá, {{ user.name }}! O seu cadastro foi realizado com sucesso!</h1>
   </div>
   <div v-if="errors.message" class="erro">{{ errors.message }}</div>
 </template>
@@ -12,7 +12,7 @@ import { User } from '@/models/User';
 import type {Errors} from "@/models/Erorrs.ts";
 
 export default defineComponent({
-  name: 'UserProfile',
+  name: 'UserRegistered',
   setup() {
     const user = ref<User>({ name: '', email: ''});
     const errors = ref<Errors>({message: ''});

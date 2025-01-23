@@ -1,36 +1,39 @@
 <template>
-  <div>
-    <h1>Bem-vindo, {{ user.name }}!</h1>
+  <div class="logout-container">
+    <p>Fazendo logout...</p>
   </div>
   <div v-if="errors.message" class="erro">{{ errors.message }}</div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import {defineComponent, onMounted, ref} from 'vue';
+import { useStore } from 'vuex';
 import api from '@/api';
-import { User } from '@/models/User';
 import type {Errors} from "@/models/Erorrs.ts";
 
 export default defineComponent({
-  name: 'UserProfile',
+  name: 'Logout',
   setup() {
-    const user = ref<User>({ name: '', email: ''});
+    const store = useStore();
     const errors = ref<Errors>({message: ''});
 
     onMounted(async () => {
       try {
-        const response = await api.getUser();
-        user.value = response.data;
+        await api.logout();
+        await store.dispatch('logout');
+
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1500);
+
       } catch (error: any) {
         if (error.response) {
           errors.message = error.response.data.mensagem;
-          window.location.href = '/login';
         }
       }
     });
 
     return {
-      user,
       errors,
     };
   },
@@ -38,6 +41,13 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.logout-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
 .erro {
   color: red;
   font-size: 14px;

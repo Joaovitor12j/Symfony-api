@@ -15,9 +15,10 @@ export default {
     login(credentials: { email: string; password: string }) {
         return apiClient.post('/login', credentials);
     },
+    logout() {
+        return apiClient.post('/logout');
+    },
     getUser() {
-        console.log('teste')
-        console.log(apiClient.get('/user'))
         return apiClient.get('/user');
     },
 };
