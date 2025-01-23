@@ -19,14 +19,14 @@ class User implements PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?DateTimeInterface $createAt = null;
+    private ?DateTimeInterface $createdAt = null;
 
     public function getId(): ?int
     {
@@ -66,10 +66,14 @@ class User implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function setCreateAt(?DateTimeInterface $createAt): static
+    public function getCreatedAt(): ?DateTimeInterface
     {
-        $this->createAt = $createAt;
-        return $this;
+        return $this->createdAt;
     }
 
+    public function setCreatedAt(DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
 }

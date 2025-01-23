@@ -52,7 +52,7 @@ final class UserController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $user = $this->userRepository->findByEmail($data['email']);
+        $user = $this->userRepository->findOneByEmail($data['email']);
 
         $userValidation = new UserValidation($user, '', $this->passwordEncoder);
         $userValidation->validateEmailExists();
@@ -61,7 +61,7 @@ final class UserController extends AbstractController
         $user->setName($data['name']);
         $user->setEmail($data['email']);
         $user->setPassword($this->passwordEncoder->hashPassword($user, $data['password']));
-        $user->setCreateAt(new DateTime());
+        $user->setCreatedAt(new DateTime());
 
         $em->persist($user);
         $em->flush();
@@ -87,7 +87,7 @@ final class UserController extends AbstractController
         $userEmail = $data['email'] ?? null;
         $userPassword = $data['password'] ?? null;
 
-        $user = $this->userRepository->findByEmail($userEmail);
+        $user = $this->userRepository->findOneByEmail($userEmail);
 
         $userValidation = new UserValidation($user, $userPassword, $this->passwordEncoder);
         $userValidation->validateUserEmail();
@@ -110,7 +110,7 @@ final class UserController extends AbstractController
         $session = $request->getSession();
         $session->invalidate();
 
-        return new JsonResponse('', 200);
+        return new JsonResponse('', 204);
     }
 
 }

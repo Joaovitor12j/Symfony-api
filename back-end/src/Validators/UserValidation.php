@@ -4,6 +4,7 @@ namespace App\Validators;
 
 use App\Entity\User;
 use App\Exception\HandleUserException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserValidation
@@ -24,9 +25,7 @@ class UserValidation
      */
     public function validateUserEmail(): void
     {
-        if (! $this->userData) {
-            throw new HandleUserException('Usuário não encontrado', 401);
-        }
+        $this->throwIf(!$this->userData, 'Usuário não encontrado', Response::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -34,9 +33,8 @@ class UserValidation
      */
     public function validateUserPassword(): void
     {
-        if (! $this->passwordEncoder->isPasswordValid($this->userData, $this->userPassword)) {
-            throw new HandleUserException('A senha informada está incorreta', 401);
-        }
+        $isValid = $this->userData && $this->passwordEncoder->isPasswordValid($this->userData, $this->userPassword);
+        $this->throwIf(!$isValid, 'Credenciais inválidas', Response::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -44,8 +42,18 @@ class UserValidation
      */
     public function validateEmailExists(): void
     {
-        if ($this->userData) {
-            throw new HandleUserException('Esse email já está cadastrado, faça login ou informe outro email', 422);
+        $this->throwIf($this->userData->getEmail(), 'Esse email já está cadastrado, faça login ou informe outro email',
+            Response::HTTP_UNPROCESSABLE_ENTITY
+        );
+    }
+
+    /**
+     * @throws HandleUserException
+     */
+    private function throwIf(bool $condition, string $message, int $code): void
+    {
+        if ($condition) {
+            throw new HandleUserException($message, $code);
         }
     }
 }

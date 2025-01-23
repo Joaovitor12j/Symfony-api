@@ -17,12 +17,12 @@ class UserRepository extends ServiceEntityRepository
     }
 
     /**
-     * Encontra um usuário pelo email.
+     * Encontra um usuário pelo email (case-sensitive dependendo do collation do banco).
      *
      * @param string $email O email do usuário
-     * @return User|null
+     * @return User|null Retorna o usuário ou null se não encontrado
      */
-    public function findByEmail(string $email): ?User
+    public function findOneByEmail(string $email): ?User
     {
         return $this->findOneBy(['email' => $email]);
     }
