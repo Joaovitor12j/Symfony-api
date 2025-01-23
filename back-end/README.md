@@ -163,3 +163,7 @@ Foi criada a exception `HandleUserException` para tratar erros específicos do d
 Implementado um Event Listeners `ExceptionSubscriber`, centralizando o tratamento de exceções e disparar os erros personalizados da 
 `HandleUserException` enquanto processa a solicitação HTTP.
 
+
+### Licença
+
+Este projeto está licenciado sob MIT License
