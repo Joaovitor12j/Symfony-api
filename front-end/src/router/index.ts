@@ -1,17 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Register from '../views/Register.vue';
-import Login from "../views/Login.vue";
-import UserProfile from '../views/UserProfile.vue';
-import UserRegistered from "../views/UserRegistered.vue";
-import Logout from "../components/Logout.vue";
+
+const PATHS = {
+    REGISTER: '/register',
+    LOGIN: '/login',
+    USER: '/user',
+    REGISTERED: '/registered',
+    LOGOUT: '/logout',
+};
 
 const routes = [
-    { path: '/', redirect: '/register' },
-    { path: '/register', component: Register },
-    { path: '/login', component: Login },
-    { path: '/user', component: UserProfile, meta: { requiresAuth: true } },
-    { path: '/registered', component: UserRegistered },
-    { path: '/logout', component: Logout },
+    { path: '/', redirect: PATHS.REGISTER },
+    { path: PATHS.REGISTER, component: () => import('../views/Register.vue') },
+    { path: PATHS.LOGIN, component: () => import('../views/Login.vue') },
+    { path: PATHS.USER, component: () => import('../views/UserProfile.vue'), meta: { requiresAuth: true } },
+    { path: PATHS.REGISTERED, component: () => import('../views/UserRegistered.vue') },
+    { path: PATHS.LOGOUT, component: () => import('../components/Logout.vue') },
 ];
 
 const router = createRouter({

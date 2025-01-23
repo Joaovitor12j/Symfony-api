@@ -3,21 +3,38 @@
     <form @submit.prevent="register">
       <div class="field">
         <label for="name">Nome:</label>
-        <input type="text" id="name" v-model="user.name" />
+        <input
+            type="text"
+            id="name"
+            v-model.trim="user.name"
+            :class="{ invalid: errors.name }"
+        />
         <span v-if="errors.name" class="erro">{{ errors.name }}</span>
       </div>
       <div class="field">
         <label for="email">Email:</label>
-        <input id="email" v-model="user.email" />
+        <input
+            type="email"
+            id="email"
+            v-model.trim="user.email"
+            :class="{ invalid: errors.email }"
+        />
         <span v-if="errors.email" class="erro">{{ errors.email }}</span>
       </div>
       <div class="field">
         <label for="password">Senha:</label>
-        <input type="password" id="password" v-model="user.password" />
+        <input
+            type="password"
+            id="password"
+            v-model.trim="user.password"
+            :class="{ invalid: errors.password }"
+        />
         <span v-if="errors.password" class="erro">{{ errors.password }}</span>
       </div>
       <div v-if="errors.message" class="erro">{{ errors.message }}</div>
-      <button type="submit">Cadastrar</button>
+      <button :disabled="isSubmitting" type="submit">
+        {{ isSubmitting ? 'Cadastrando...' : 'Cadastrar' }}
+      </button>
     </form>
     <div class="login-link">
       <p>Já é cadastrado? <router-link to="/login">Faça login aqui</router-link></p>
@@ -26,72 +43,99 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, reactive, ref } from 'vue';
 import api from '@/api';
 import type { User } from '@/models/User';
-import type {Errors} from "@/models/Erorrs.ts";
+import type { Errors } from '@/models/Erorrs.ts';
 
 export default defineComponent({
   name: 'RegisterForm',
-  data() {
-    return {
-      user: {
-        name: '',
-        email: '',
-        password: ''
-      } as User,
-      errors: {
-        name: '',
-        email: '',
-        password: '',
-        message: ''
-      } as Errors
-    };
-  },
-  methods: {
-    async register() {
+  setup() {
+    const user = reactive<User>({
+      name: '',
+      email: '',
+      password: '',
+    });
+
+    const errors = reactive<Errors>({
+      name: '',
+      email: '',
+      password: '',
+      message: '',
+    });
+
+    const isSubmitting = ref(false);
+
+    const register = async () => {
+      if (isSubmitting.value) return;
+      isSubmitting.value = true;
+      clearErrors();
+
       try {
-        this.validateFormInput();
-        if (Object.keys(this.errors).length > 0) {
-          throw new Error('Dados de cadastros inválidos.');
+        validateFormInput();
+
+        if (Object.values(errors).some((error) => error)) {
+          isSubmitting.value = false;
+          return;
         }
 
-        const response = await api.register(this.user);
-        this.user = {};
+        const response = await api.register(user);
         if (response.status === 201) {
-          this.$router.push('/registered');
+          clearForm();
+          window.location.href = '/registered';
         }
       } catch (error: any) {
         if (error.response && error.response.status === 422) {
-          this.errors.message = error.response.data.mensagem;
+          errors.message = error.response.data.mensagem;
+        } else {
+          errors.message = 'Erro ao realizar o cadastro. Tente novamente mais tarde.';
         }
+      } finally {
+        isSubmitting.value = false;
       }
-    },
-    validateFormInput() {
-      this.errors = {};
+    };
 
-      if (!this.user.name) {
-        this.errors.name = 'O nome é obrigatório.';
-      }
-
-      if (!this.user.email) {
-        this.errors.email = 'O email é obrigatório.';
-      } else if (!this.emailValidate(this.user.email)) {
-        this.errors.email = 'Insira um email válido.';
+    const validateFormInput = () => {
+      if (!user.name) {
+        errors.name = 'O nome é obrigatório.';
+      } else if (user.name.length < 3) {
+        errors.name = 'O nome deve ter pelo menos 3 caracteres.';
       }
 
-      if (!this.user.password) {
-        this.errors.password = 'A senha é obrigatória.';
-      } else if (this.user.password.length < 6) {
-        this.errors.password = 'A senha deve ter pelo menos 6 caracteres.';
+      if (!user.email) {
+        errors.email = 'O email é obrigatório.';
+      } else if (!emailValidate(user.email)) {
+        errors.email = 'Insira um email válido.';
       }
 
-      return this.errors;
-    },
-    emailValidate(email: string) {
+      if (!user.password) {
+        errors.password = 'A senha é obrigatória.';
+      } else if (user.password.length < 6) {
+        errors.password = 'A senha deve ter pelo menos 6 caracteres.';
+      }
+    };
+
+    const clearErrors = () => {
+      Object.keys(errors).forEach((key) => (errors[key] = ''));
+    };
+
+    const clearForm = () => {
+      user.name = '';
+      user.email = '';
+      user.password = '';
+    };
+
+    const emailValidate = (email: string) => {
       const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
       return regex.test(email);
-    }
+    };
+
+    return {
+      user,
+      errors,
+      isSubmitting,
+      register,
+    };
   },
 });
 </script>
@@ -104,11 +148,12 @@ export default defineComponent({
 }
 h1 {
   text-align: center;
+  margin-bottom: 20px;
 }
 .field {
   margin-bottom: 20px;
 }
-.label, label {
+label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
@@ -117,11 +162,16 @@ input {
   width: 100%;
   padding: 8px;
   box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+input.invalid {
+  border-color: red;
 }
 .erro {
   color: red;
   font-size: 14px;
-  padding-bottom: 10px;
+  margin-top: 5px;
 }
 button {
   width: 100%;
@@ -132,7 +182,11 @@ button {
   font-size: 16px;
   cursor: pointer;
 }
-button:hover {
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+button:hover:not(:disabled) {
   background-color: #38a274;
 }
 .login-link {

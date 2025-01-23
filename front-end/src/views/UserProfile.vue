@@ -1,34 +1,44 @@
 <template>
   <div>
-    <h1>Bem-vindo, {{ user.name }}!</h1>
+    <h1 v-if="!loading">Bem-vindo, {{ user.name }}!</h1>
+    <div v-else class="loading">Carregando...</div>
     <button @click="logout">Sair</button>
-    <div v-if="errors.message" class="erro">{{ errors.message }}</div>
+    <ErrorMessage v-if="errors.message" :message="errors.message" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import api from '@/api';
+import ErrorMessage from '@/components/ErrorMessage.vue';
 import { User } from '@/models/User';
-import type {Errors} from "@/models/Erorrs.ts";
+import type { Errors } from '@/models/Erorrs.ts';
 
 export default defineComponent({
   name: 'UserProfile',
+  components: { ErrorMessage },
   setup() {
-    const user = ref<User>({ name: '', email: ''});
-    const errors = ref<Errors>({message: ''});
+    const user = ref<User>({ name: '', email: '' });
+    const errors = ref<Errors>({ message: '' });
+    const loading = ref<boolean>(true);
     const store = useStore();
+    const router = useRouter();
 
     onMounted(async () => {
       try {
         const response = await api.getUser();
         user.value = response.data;
       } catch (error: any) {
-        if (error.response) {
+        if (error.response && error.response.data?.mensagem) {
           errors.value.message = error.response.data.mensagem;
-          window.location.href = '/login';
+        } else {
+          errors.value.message = 'Erro ao carregar os dados do usuário.';
         }
+        await router.push('/login');
+      } finally {
+        loading.value = false;
       }
     });
 
@@ -36,7 +46,7 @@ export default defineComponent({
       try {
         await api.logout();
         await store.dispatch('logout');
-        window.location.href = '/login';
+        await router.push('/login');
       } catch (error: any) {
         errors.value.message = 'Erro ao fazer logout. Por favor, tente novamente.';
       }
@@ -45,7 +55,8 @@ export default defineComponent({
     return {
       user,
       errors,
-      logout
+      loading,
+      logout,
     };
   },
 });
@@ -68,5 +79,9 @@ button {
 }
 button:hover {
   background-color: #38a274;
+}
+.loading {
+  font-size: 18px;
+  color: #666;
 }
 </style>

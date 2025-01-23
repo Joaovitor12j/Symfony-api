@@ -3,81 +3,113 @@
     <form @submit.prevent="login">
       <div class="field">
         <label for="email">Email:</label>
-        <input type="email" id="email" v-model="credentials.email" />
+        <input
+            type="email"
+            id="email"
+            v-model.trim="credentials.email"
+            :class="{ invalid: errors.email }"
+        />
         <span v-if="errors.email" class="erro">{{ errors.email }}</span>
       </div>
       <div class="field">
         <label for="password">Senha:</label>
-        <input type="password" id="password" v-model="credentials.password" />
+        <input
+            type="password"
+            id="password"
+            v-model.trim="credentials.password"
+            :class="{ invalid: errors.password }"
+        />
         <span v-if="errors.password" class="erro">{{ errors.password }}</span>
       </div>
       <div v-if="errors.message" class="erro">{{ errors.message }}</div>
-      <button type="submit">Entrar</button>
+      <button :disabled="isSubmitting" type="submit">
+        {{ isSubmitting ? 'Entrando...' : 'Entrar' }}
+      </button>
     </form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, reactive, ref } from 'vue';
 import api from '@/api';
-import type { User } from '@/models/User';
-import type {Errors} from "@/models/Erorrs.ts";
+import type { Credentials } from '@/models/User';
+import type { Errors } from '@/models/Erorrs.ts';
 
 export default defineComponent({
   name: 'LoginForm',
-  data() {
-    return {
-      credentials: {
-        email: '',
-        password: ''
-      } as User,
-      errors: {
-        email: '',
-        password: '',
-        message: ''
-      } as Errors,
-    };
-  },
-  methods: {
-    async login() {
-      try {
-        this.validateFormInput();
+  setup() {
+    const credentials = reactive<Credentials>({
+      email: '',
+      password: '',
+    });
 
-        if (Object.keys(this.errors).length > 0) {
-          throw new Error('Dados de cadastros inválidos.');
+    const errors = reactive<Errors>({
+      email: '',
+      password: '',
+      message: '',
+    });
+
+    const isSubmitting = ref(false);
+
+    const login = async () => {
+      if (isSubmitting.value) return;
+      isSubmitting.value = true;
+      clearErrors();
+
+      try {
+        validateFormInput();
+
+        if (Object.values(errors).some((error) => error)) {
+          isSubmitting.value = false;
+          return;
         }
 
-        const response = await api.login(this.credentials);
+        const response = await api.login(credentials);
         if (response.status === 200) {
-          this.$router.push('/user');
+          window.location.href = '/user';
         }
       } catch (error: any) {
-        if (error.response && error.response.status === 401) {
-          this.errors.message = error.response.data.mensagem;
+        if (error.response) {
+          errors.message = error.response.data.mensagem || 'Erro no servidor.';
+        } else {
+          errors.message = 'Erro ao se conectar com o servidor.';
         }
+      } finally {
+        isSubmitting.value = false;
       }
-    },
-    validateFormInput() {
-      this.errors = {};
+    };
 
-      if (!this.credentials.email) {
-        this.errors.email = 'O email é obrigatório.';
-      } else if (!this.emailValidate(this.credentials.email)) {
-        this.errors.email = 'Insira um email válido.';
-      }
-
-      if (!this.credentials.password) {
-        this.errors.password = 'A senha é obrigatória.';
-      } else if (this.credentials.password.length < 6) {
-        this.errors.password = 'A senha deve ter pelo menos 6 caracteres.';
+    const validateFormInput = () => {
+      if (!credentials.email) {
+        errors.email = 'O email é obrigatório.';
+      } else if (!emailValidate(credentials.email)) {
+        errors.email = 'Insira um email válido.';
       }
 
-      return this.errors;
-    },
-    emailValidate(email: string) {
+      if (!credentials.password) {
+        errors.password = 'A senha é obrigatória.';
+      } else if (credentials.password.length < 6) {
+        errors.password = 'A senha deve ter pelo menos 6 caracteres.';
+      }
+    };
+
+    const clearErrors = () => {
+      errors.email = '';
+      errors.password = '';
+      errors.message = '';
+    };
+
+    const emailValidate = (email: string) => {
       const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
       return regex.test(email);
-    }
+    };
+
+    return {
+      credentials,
+      errors,
+      isSubmitting,
+      login,
+    };
   },
 });
 </script>
@@ -94,7 +126,7 @@ h1 {
 .field {
   margin-bottom: 20px;
 }
-.label, label {
+label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
@@ -104,9 +136,13 @@ input {
   padding: 8px;
   box-sizing: border-box;
 }
+input.invalid {
+  border: 1px solid red;
+}
 .erro {
   color: red;
   font-size: 14px;
+  margin-top: 5px;
 }
 button {
   width: 100%;
@@ -117,7 +153,11 @@ button {
   font-size: 16px;
   cursor: pointer;
 }
-button:hover {
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+button:hover:not(:disabled) {
   background-color: #38a274;
 }
 </style>
