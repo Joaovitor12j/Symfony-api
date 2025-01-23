@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Exception\HandleUserException;
 use App\Repository\UserRepository;
+use App\Validators\UserValidation;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,19 +31,31 @@ final class UserController extends AbstractController
 
         $userName = $session->get('name');
         $userEmail = $session->get('email');
-        $userId = $session->get('usuario_id');
+
+        if (! $userName || ! $userEmail) {
+            return new JsonResponse([
+                'mensagem' => 'Usuário não autenticado.'
+            ], 401);
+        }
 
         return new JsonResponse([
             'name' => $userName,
-            'email' => $userEmail,
-            'usuario_id' => $userId,
+            'email' => $userEmail
         ]);
     }
 
+    /**
+     * @throws HandleUserException
+     */
     #[Route('/register', methods: ['POST'])]
     public function register(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+
+        $user = $this->userRepository->findByEmail($data['email']);
+
+        $userValidation = new UserValidation($user, '', $this->passwordEncoder);
+        $userValidation->validateEmailExists();
 
         $user = new User();
         $user->setName($data['name']);
@@ -52,12 +66,19 @@ final class UserController extends AbstractController
         $em->persist($user);
         $em->flush();
 
+        $session = $request->getSession();
+        $session->set('name', $user->getName());
+        $session->set('email', $user->getEmail());
+
         return new JsonResponse([
-            'name' => $data['name'],
-            'email' => $data['email']
+            'name' => $user->getName(),
+            'email' => $user->getEmail()
         ], 201);
     }
 
+    /**
+     * @throws HandleUserException
+     */
     #[Route('/login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
     {
@@ -68,23 +89,22 @@ final class UserController extends AbstractController
 
         $user = $this->userRepository->findByEmail($userEmail);
 
-        if (!$user || !$this->passwordEncoder->isPasswordValid($user, $userPassword)) {
-            return new JsonResponse(['mensagem' => 'Senha ou email incorreto'], 401);
-        }
+        $userValidation = new UserValidation($user, $userPassword, $this->passwordEncoder);
+        $userValidation->validateUserEmail();
+        $userValidation->validateUserPassword();
 
         $session = $request->getSession();
-        $session->set('usuario_id', $user->getId());
         $session->set('name', $user->getName());
         $session->set('email', $user->getEmail());
 
         return new JsonResponse([
             'name' => $user->getName(),
-            'email' => $data['email']
+            'email' => $user->getEmail()
         ], 200);
 
     }
 
-    #[Route('/logout', methods: ['GET'])]
+    #[Route('/logout', methods: ['POST'])]
     public function logout(Request $request): JsonResponse
     {
         $session = $request->getSession();

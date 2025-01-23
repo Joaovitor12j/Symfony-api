@@ -41,7 +41,6 @@ class User implements PasswordAuthenticatedUserInterface
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -53,7 +52,6 @@ class User implements PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -65,19 +63,12 @@ class User implements PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
         return $this;
-    }
-
-    public function getCreateAt(): ?DateTimeInterface
-    {
-        return $this->createAt;
     }
 
     public function setCreateAt(?DateTimeInterface $createAt): static
     {
         $this->createAt = $createAt;
-
         return $this;
     }
 
