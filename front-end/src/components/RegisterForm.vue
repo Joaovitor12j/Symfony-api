@@ -19,6 +19,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import api from '@/api';
+import type { User } from '@/models/User';
 
 export default defineComponent({
   name: 'RegisterForm',
@@ -27,8 +28,8 @@ export default defineComponent({
       user: {
         name: '',
         email: '',
-        password: '',
-      },
+        password: ''
+      } as User
     };
   },
   methods: {
