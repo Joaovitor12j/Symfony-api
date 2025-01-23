@@ -7,11 +7,13 @@ Foi criado uma documentação mais detalhada para API Symfoy e para a aplicaçã
 [API Symfony](/back-end/README.md)
 
 **Front-end**  
-[Aplicação VUW](/front-end/README.md)
+[Aplicação Vue](/front-end/README.md)
 
 ## API Symfony com Integração Vue.js
 
-Este repositório contém um projeto construído com o framework Symfony para o backend e Vue.js no frontend. O objetivo é fornecer uma API RESTful para
+Este repositório contém um projeto construído com o framework Symfony para o backend e Vue.js no frontend.
+
+O objetivo é fornecer uma API RESTful para
 manipulação de usuários com funcionalidades como cadastro, login e validação de sessão.
 
 ## Requisitos do Sistema
@@ -34,6 +36,10 @@ Certifique-se de que os seguintes requisitos estejam instalados em sua máquina:
     ```
 
 2. Configurar as Dependências do Backend
+   * Navegue até o diretório do backend
+    ``` bash
+      cd back-end
+    ```
     * Instale as dependências do Symfony:
    ``` bash
     composer install
