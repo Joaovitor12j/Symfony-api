@@ -1,0 +1,126 @@
+{
+	"info": {
+		"_postman_id": "a5cc944c-82af-4a04-ac96-e311b6851ae3",
+		"name": "API - MERCHION",
+		"description": "API construída com PHP utilizando o framework Symfony.\n\nAPI RESTful para manipulação de usuários com funcionalidades como cadastro, autenticação e gestão de sessões",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21571963"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"\",\n    \"email\": \"\",\n    \"password\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/register",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"register"
+							]
+						},
+						"description": "Rota para cadastro de usuário\n\nNecessário informar nome, email e senha.\n\nNão é permitido cadastrar mais de um usuário com o mesmo email.\n\nApós o cadastro, nome e email do usuário ficam salvos na sessão."
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"\",\n    \"password\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"login"
+							]
+						},
+						"description": "Rota para login de usuário.\n\nNecessário informar o email e senha do usuário cadastrado.\n\nApós o login, nome e email do usuário ficam salvos na sessão."
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/logout",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"logout"
+							]
+						},
+						"description": "Rota para remover os dados do usuário da sessão."
+					},
+					"response": []
+				},
+				{
+					"name": "user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/user",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"user"
+							]
+						},
+						"description": "Rota para acessar os dados do usuário logado."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
