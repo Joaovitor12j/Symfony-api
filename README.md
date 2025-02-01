@@ -32,7 +32,7 @@ Certifique-se de que os seguintes requisitos estejam instalados em sua máquina:
 1. Clonar o Repositório
 
     ``` bash
-      git clone git@github.com:Joaovitor12j/desafio-merchion.git
+      git clone git@github.com:Joaovitor12j/symfony-api.git
     ```
 
 2. Configurar as Dependências do Backend
@@ -103,7 +103,7 @@ Certifique-se de que os seguintes requisitos estejam instalados em sua máquina:
 Foi criada uma Collection.JSON do Postman com todos os Endpoints da API,
 pode ser baixado o arquivo e importado no Postman  
 
-[Collection](/API%20-%20MERCHION.postman_collection.json)
+[Collection](/API%20-%20USERS-CRUD.postman_collection.json)
 
 **Base URL**
 

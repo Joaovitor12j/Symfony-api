@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "a5cc944c-82af-4a04-ac96-e311b6851ae3",
-		"name": "API - MERCHION",
+		"name": "API - SYMFONY",
 		"description": "API construída com PHP utilizando o framework Symfony.\n\nAPI RESTful para manipulação de usuários com funcionalidades como cadastro, autenticação e gestão de sessões",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "21571963"

@@ -28,7 +28,7 @@ Certifique-se de que os seguintes requisitos estejam instalados em sua máquina:
 1. Clonar o Repositório
 
 ``` bash
-  git clone git@github.com:Joaovitor12j/desafio-merchion.git
+  git clone git@github.com:Joaovitor12j/symfony-api.git
 ```
 
 2. Configurar as Dependências do Frontend
