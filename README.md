@@ -1,7 +1,7 @@
-# README
+# Symfony API
 
 ## Documentação Completa 
-Foi criado uma documentação mais detalhada para API Symfoy e para a aplicação Front-end
+Foi criado uma documentação mais detalhada para API Symfony e para a aplicação Front-end
 
 **Back-end**  
 [API Symfony](/back-end/README.md)
